@@ -1,0 +1,6 @@
+[mysqld]
+
+skip-name-resolve
+
+server-id = 2
+binlog_do_db = db

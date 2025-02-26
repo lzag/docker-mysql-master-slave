@@ -1,35 +1,52 @@
-version: '3'
+version: "3"
 services:
-  mysql_master:
+  mysql_source:
     image: mysql:8.0
-    env_file:
-      - ./master/mysql_master.env
-    container_name: "mysql_master"
-    restart: "no"
+    hostname: mysql_source
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_PORT: 3306
+      MYSQL_USER: mydb_user
+      MYSQL_PASSWORD: mydb_pwd
+      MYSQL_DATABASE: '${MYSQL_DB}'
+      MYSQL_REPLICA_USER: '${MYSQL_REPLICA_USER}'
+      MYSQL_REPLICA_PASSWORD: '${MYSQL_REPLICA_PASS}'
     ports:
       - 4406:3306
     volumes:
-      - ./master/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
-      - ./master/data:/var/lib/mysql
-    networks:
-      - overlay
+      - ./source/conf:/etc/mysql/conf.d
+      - ./source/init/:/docker-entrypoint-initdb.d/
+      - mysql_source:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h localhost -uroot -p${MYSQL_ROOT_PASSWORD}
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
-  mysql_slave:
+  mysql_replica:
     image: mysql:8.0
-    env_file:
-      - ./slave/mysql_slave.env
-    container_name: "mysql_slave"
-    restart: "no"
+    hostname: mysql_replica
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_PORT: 3306
+      MYSQL_USER: '${MYSQL_REPLICA_USER}'
+      MYSQL_PASSWORD: '${MYSQL_REPLICA_PASS}'
+      MYSQL_DATABASE: '${MYSQL_DB}'
     ports:
       - 5506:3306
     depends_on:
-      - mysql_master
+      mysql_source:
+        condition: service_healthy
     volumes:
-      - ./slave/conf/mysql.conf.cnf:/etc/mysql/conf.d/mysql.conf.cnf
-      - ./slave/data:/var/lib/mysql
-    networks:
-      - overlay
+      - ./replica/conf:/etc/mysql/conf.d
+      - ./replica/init/:/docker-entrypoint-initdb.d/
+      - mysql_replica:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h localhost -uroot -p${MYSQL_ROOT_PASSWORD}
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
-networks:
-  overlay:
-
+volumes:
+  mysql_source:
+  mysql_replica:

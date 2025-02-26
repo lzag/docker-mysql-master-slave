@@ -3,8 +3,6 @@ Docker MySQL master-slave replication
 
 MySQL 8.0 master-slave replication with using Docker. 
 
-Previous version based on MySQL 5.7 is available in [mysql5.7](https://github.com/vbabak/docker-mysql-master-slave/tree/mysql5.7) branch.
-
 ## Run
 
 To run this examples you will need to start containers with "docker-compose" 
@@ -25,7 +23,7 @@ docker exec mysql_master sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'cre
 #### Read changes from slave
 
 ```bash
-docker exec mysql_slave sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from code \G'"
+docker compose exec mysql_slave sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from code \G'"
 ```
 
 ## Troubleshooting
@@ -33,46 +31,45 @@ docker exec mysql_slave sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'sele
 #### Check Logs
 
 ```bash
-docker-compose logs
+docker compose logs
 ```
 
 #### Start containers in "normal" mode
 
-> Go through "build.sh" and run command step-by-step.
+docker compose up
 
 #### Check running containers
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 #### Clean data dir
 
 ```bash
-rm -rf ./master/data/*
-rm -rf ./slave/data/*
+docker compose down -v
 ```
 
 #### Run command inside "mysql_master"
 
 ```bash
-docker exec mysql_master sh -c 'mysql -u root -p111 -e "SHOW MASTER STATUS \G"'
+docker compose exec mysql_master sh -c 'mysql -u root -p111 -e "SHOW MASTER STATUS \G"'
 ```
 
 #### Run command inside "mysql_slave"
 
 ```bash
-docker exec mysql_slave sh -c 'mysql -u root -p111 -e "SHOW SLAVE STATUS \G"'
+docker compose exec mysql_slave sh -c 'mysql -u root -p111 -e "SHOW SLAVE STATUS \G"'
 ```
 
 #### Enter into "mysql_master"
 
 ```bash
-docker exec -it mysql_master bash
+docker compose exec mysql_master bash
 ```
 
 #### Enter into "mysql_slave"
 
 ```bash
-docker exec -it mysql_slave bash
+docker compose exec -it mysql_slave bash
 ```

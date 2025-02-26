@@ -1,0 +1,15 @@
+#!/bin/bash
+
+MS_STATUS=`mysql -h mysql_source -u root -p$MYSQL_ROOT_PASSWORD -e "SHOW MASTER STATUS"`
+CURRENT_LOG=`echo $MS_STATUS | awk '{print $6}'`
+CURRENT_POS=`echo $MS_STATUS | awk '{print $7}'`
+
+mysql -u root -p$MYSQL_ROOT_PASSWORD <<EOF
+  CHANGE REPLICATION SOURCE TO
+    SOURCE_HOST='mysql_source',
+    SOURCE_USER='$MYSQL_USER',
+    SOURCE_PASSWORD='$MYSQL_PASS',
+    SOURCE_LOG_FILE='$CURRENT_LOG',
+    SOURCE_LOG_POS=$CURRENT_POS;
+  START REPLICA;
+EOF
