@@ -1,14 +1,14 @@
-version: "3"
 services:
   mysql_source:
-    image: mysql:8.0
+    image: mysql:8.4
     hostname: mysql_source
+    container_name: mysql_source
     environment:
       MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
       MYSQL_PORT: 3306
       MYSQL_USER: mydb_user
       MYSQL_PASSWORD: mydb_pwd
-      MYSQL_DATABASE: '${MYSQL_DB}'
+      MYSQL_DATABASE: db
       MYSQL_REPLICA_USER: '${MYSQL_REPLICA_USER}'
       MYSQL_REPLICA_PASSWORD: '${MYSQL_REPLICA_PASS}'
     ports:
@@ -24,14 +24,15 @@ services:
       retries: 20
 
   mysql_replica:
-    image: mysql:8.0
+    image: mysql:8.4
     hostname: mysql_replica
+    container_name: mysql_replica
     environment:
       MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
       MYSQL_PORT: 3306
       MYSQL_USER: '${MYSQL_REPLICA_USER}'
       MYSQL_PASSWORD: '${MYSQL_REPLICA_PASS}'
-      MYSQL_DATABASE: '${MYSQL_DB}'
+      MYSQL_DATABASE: db
     ports:
       - 5506:3306
     depends_on:

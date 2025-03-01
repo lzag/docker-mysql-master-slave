@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MS_STATUS=`mysql -h mysql_source -u root -p$MYSQL_ROOT_PASSWORD -e "SHOW MASTER STATUS"`
+MS_STATUS=`mysql -h mysql_source -u root -p$MYSQL_ROOT_PASSWORD -e "SHOW BINARY LOG STATUS"`
 CURRENT_LOG=`echo $MS_STATUS | awk '{print $6}'`
 CURRENT_POS=`echo $MS_STATUS | awk '{print $7}'`
 

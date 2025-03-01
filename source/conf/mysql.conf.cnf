@@ -2,8 +2,6 @@
 
 skip-name-resolve
 
-server-id = 1
-log_bin = replication-log 
-relay-log=mysql_replica-relay-bin
-binlog_format = ROW
+server_id = 1
+log_bin = true
 binlog_do_db = db

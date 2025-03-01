@@ -1,29 +1,22 @@
 Docker MySQL master-slave replication 
 ========================
 
-MySQL 8.0 master-slave replication with using Docker. 
+MySQL 8 master-slave replication with Docker. 
 
 ## Run
 
-To run this examples you will need to start containers with "docker-compose" 
-and after starting setup replication. See commands inside ./build.sh. 
-
-#### Create 2 MySQL containers with master-slave row-based replication 
-
-```bash
-./build.sh
-```
+To run this examples you will need to start containers with "docker compose up". The replication is set up automagically when the containers are started. 
 
 #### Make changes to master
 
 ```bash
-docker exec mysql_master sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'create table code(code int); insert into code values (100), (200)'"
+docker compose exec mysql_source sh -c 'mysql -p${MYSQL_ROOT_PASSWORD} db -e "INSERT INTO code VALUES (100), (200)"'
 ```
 
-#### Read changes from slave
+#### Read changes from replica
 
 ```bash
-docker compose exec mysql_slave sh -c "export MYSQL_PWD=111; mysql -u root mydb -e 'select * from code \G'"
+docker compose exec mysql_replica sh -c 'mysql -p${MYSQL_ROOT_PASSWORD} db -e "select * from code \G"'
 ```
 
 ## Troubleshooting
@@ -34,42 +27,14 @@ docker compose exec mysql_slave sh -c "export MYSQL_PWD=111; mysql -u root mydb 
 docker compose logs
 ```
 
-#### Start containers in "normal" mode
-
-docker compose up
-
-#### Check running containers
+#### Check master status
 
 ```bash
-docker compose ps
+docker compose exec mysql_source sh -c 'mysql -p${MYSQL_ROOT_PASSWORD} -e "SHOW BINARY LOG STATUS \G"'
 ```
 
-#### Clean data dir
+#### Check replica status
 
 ```bash
-docker compose down -v
-```
-
-#### Run command inside "mysql_master"
-
-```bash
-docker compose exec mysql_master sh -c 'mysql -u root -p111 -e "SHOW MASTER STATUS \G"'
-```
-
-#### Run command inside "mysql_slave"
-
-```bash
-docker compose exec mysql_slave sh -c 'mysql -u root -p111 -e "SHOW SLAVE STATUS \G"'
-```
-
-#### Enter into "mysql_master"
-
-```bash
-docker compose exec mysql_master bash
-```
-
-#### Enter into "mysql_slave"
-
-```bash
-docker compose exec -it mysql_slave bash
+docker compose exec mysql_replica sh -c 'mysql -p${MYSQL_ROOT_PASSWORD} -e "SHOW REPLICA STATUS \G"'
 ```

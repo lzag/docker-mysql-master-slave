@@ -2,5 +2,6 @@
 
 skip-name-resolve
 
-server-id = 2
-binlog_do_db = db
+server_id = 2
+replicate_do_db = db
+relay_log=mysql_replica-relay-bin

@@ -1,0 +1,1 @@
+CREATE TABLE db.code (code INT);
